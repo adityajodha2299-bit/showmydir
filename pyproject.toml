@@ -1,0 +1,20 @@
+[project]
+name = "showmydir"
+version = "0.1.2"
+description = "A powerful CLI tool to visualize and recreate directory structures with smart ignore rules"
+readme = "README.md"
+requires-python = ">=3.12"
+
+authors = [
+    { name = "Aditya Pratap Singh Rathore" }
+]
+
+license = "MIT"
+
+dependencies = [
+    "typer>=0.7.0",
+    "rich"
+]
+
+[project.scripts]
+showmydir = "showmydir.__main__:main"

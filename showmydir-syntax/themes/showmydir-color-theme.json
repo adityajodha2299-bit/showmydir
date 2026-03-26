@@ -1,0 +1,37 @@
+{
+    "name": "ShowMyDir",
+    "tokenColors": [
+        {
+            "scope": "entity.name.tag.showmydir",
+            "settings": { "foreground": "#DFE2E7" }
+        },
+        {
+            "scope": "entity.name.tag.meta.showmydir",
+            "settings": { "foreground": "#77B7D7" }
+        },
+        {
+            "scope": "constant.language.boolean.showmydir",
+            "settings": { "foreground": "#FFA500" }
+        },
+        {
+            "scope": "punctuation.square.bracket.showmydir",
+            "settings": { "foreground": "#F3CD05" }
+        },
+        {
+            "scope": "constant.numeric.showmydir",
+            "settings": { "foreground": "#6A9FB5" }
+        },
+        {
+            "scope": "constant.numeric.meta.showmydir",
+            "settings": { "foreground": "#FFFFFF" }
+        },
+        {
+            "scope": "string.quoted.double.meta.showmydir",
+            "settings": { "foreground": "#B5CE8A" }
+        },
+        {
+            "scope": "constant.language.boolean.meta.showmydir",
+            "settings": { "foreground": "#FFA500" }
+        }
+    ]
+}

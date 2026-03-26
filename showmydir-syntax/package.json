@@ -1,0 +1,25 @@
+{
+  "name": "showmydir-syntax",
+  "displayName": "ShowMyDir_Syntax",
+  "description": "Syntax highlighting for ShowMyDir .smd files with colors",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.110.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "showmydir",
+      "aliases": ["ShowMyDir", "showmydir"],
+      "extensions": [".smd"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "showmydir",
+      "scopeName": "source.showmydir",
+      "path": "./syntaxes/showmydir.tmLanguage.json"
+    }]
+  }
+}

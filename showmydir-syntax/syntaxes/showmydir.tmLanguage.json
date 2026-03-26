@@ -1,0 +1,139 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "ShowMyDir",
+	"patterns": [
+		{ "include": "#meta_block" },
+		{ "include": "#special_keys" },
+		{ "include": "#keys" },
+		{ "include": "#keywords" },
+		{ "include": "#booleans" },
+		{ "include": "#numbers" },
+		{ "include": "#brackets" },
+		{ "include": "#strings" }
+	],
+	"repository": {
+		"meta_block": {
+			"begin": "(\"meta\")(\\s*:)(\\s*\\{)",
+			"beginCaptures": {
+				"1": { "name": "entity.name.tag.special.showmydir" },
+				"2": { "name": "punctuation.separator.key-value.showmydir" },
+				"3": { "name": "punctuation.definition.object.begin.showmydir" }
+			},
+			"end": "\\}",
+			"endCaptures": {
+				"0": { "name": "punctuation.definition.object.end.showmydir" }
+			},
+			"patterns": [
+				{ "include": "#meta_keys" },
+				{ "include": "#meta_numbers" },
+				{ "include": "#meta_strings" },
+				{ "include": "#meta_booleans" }
+			]
+		},
+		"meta_keys": {
+			"patterns": [
+				{
+					"match": "(\"(generated_by|version|root_path|total_files|total_dirs)\")\\s*:",
+					"name": "entity.name.tag.meta.showmydir",
+					"captures": {
+						"1": { "name": "punctuation.definition.string.showmydir" },
+						"0": { "name": "entity.name.tag.meta.showmydir" }
+					}
+				}
+			]
+		},
+		"meta_numbers": {
+			"patterns": [
+				{
+					"name": "constant.numeric.meta.showmydir",
+					"match": "\\b\\d+(\\.\\d+)?\\b"
+				}
+			]
+		},
+		"meta_strings": {
+			"name": "string.quoted.double.meta.showmydir",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.showmydir.meta",
+					"match": "\\\\."
+				}
+			]
+		},
+		"meta_booleans": {
+			"patterns": [
+				{
+					"name": "constant.language.boolean.meta.showmydir",
+					"match": "\\b(true|false)\\b"
+				}
+			]
+		},
+		"special_keys": {
+			"patterns": [
+				{
+					"match": "(\"_format\")(\\s*:)",
+					"captures": {
+						"1": { "name": "entity.name.tag.special.showmydir" },
+						"2": { "name": "punctuation.separator.key-value.showmydir" }
+					}
+				}
+			]
+		},
+		"keys": {
+			"patterns": [
+				{
+					"match": "(\")(name|is_dir|size|has_unknown_size|logical_size|is_highlighted|children)(\")(\\s*:)",
+					"captures": {
+						"1": { "name": "punctuation.definition.string.begin.showmydir" },
+						"2": { "name": "entity.name.tag.showmydir" },
+						"3": { "name": "punctuation.definition.string.end.showmydir" },
+						"4": { "name": "punctuation.separator.key-value.showmydir" }
+					}
+				}
+			]
+		},
+		"keywords": {
+			"patterns": [{
+				"name": "keyword.control.showmydir",
+				"match": "\\b(if|while|for|return)\\b"
+			}]
+		},
+		"booleans": {
+			"patterns": [
+				{
+					"name": "constant.language.boolean.showmydir",
+					"match": "\\b(true|false)\\b"
+				}
+			]
+		},
+		"brackets": {
+			"patterns": [
+				{
+					"name": "punctuation.square.bracket.showmydir",
+					"match": "\\[|\\]"
+				}
+			]
+		},
+		"numbers": {
+			"patterns": [
+				{
+					"name": "constant.numeric.showmydir",
+					"match": "\\b\\d+(\\.\\d+)?\\b"
+				}
+			]
+		},
+		"strings": {
+			"name": "string.quoted.double.showmydir",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.showmydir",
+					"match": "\\\\."
+				}
+			]
+		}
+	},
+	"scopeName": "source.showmydir"
+}
