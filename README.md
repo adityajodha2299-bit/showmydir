@@ -56,12 +56,12 @@ showmydir tree --python --git --node
 ```
 
 Available categories:
-- `--python`
-- `--node`
-- `--gitignore`
-- `--docker`
-- `--editor`
-- `--rust`
+- `--python-ignore`
+- `--node-ignore`
+- `--git-ignore`
+- `--docker-ignore`
+- `--editor-ignore`
+- `--rust-ignore`
 - `--uv`
 
 ## How `.smd` Works

@@ -187,7 +187,9 @@ def tree(
         " Example: -I '*.log,node_modules'",
     ),
     uv: bool = typer.Option(
-        False, "--uv", help="Apply common Python/uv ignore patterns (.venv, pyproject.toml, etc.)"
+        False,
+        "--uv--ignore",
+        help="Apply common Python/uv ignore patterns (.venv, pyproject.toml, etc.)",
     ),
     no_default_ignores: bool = typer.Option(
         False,
