@@ -29,28 +29,29 @@ pip install showmydir
 
 ## Usage
 ### Show directory tree
-```
+```bash
 showmydir tree --root ./my_project
 ```
 
 ### Flat mode
-```
+```bash
 showmydir tree --mode flat
 ```
 
 ### Save structure to `.smd`
-```
+```bash
 showmydir tree --output project.smd
 ```
 
 ### Recreate structure from `.smd`
-```
+```bash
 showmydir create-tree project.smd
 ```
 
 ## Ignore Options
 Enable smart ignores:
-```
+
+```bash
 showmydir tree --python --git --node
 ```
 
