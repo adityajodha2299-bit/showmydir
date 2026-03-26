@@ -16,5 +16,9 @@ dependencies = [
     "rich"
 ]
 
+[project.urls]
+Homepage = "https://github.com/adityajodha2299-bit/showmydir"
+Issues = "https://github.com/adityajodha2299-bit/showmydir/issues"
+
 [project.scripts]
 showmydir = "showmydir.__main__:main"
