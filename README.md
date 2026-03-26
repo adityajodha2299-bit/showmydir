@@ -62,7 +62,7 @@ Available categories:
 - `--docker-ignore`
 - `--editor-ignore`
 - `--rust-ignore`
-- `--uv`
+- `--uv--ignore`
 
 ## How `.smd` Works
 
