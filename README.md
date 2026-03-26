@@ -58,7 +58,7 @@ showmydir tree --python --git --node
 Available categories:
 - `--python`
 - `--node`
-- `--git`
+- `--gitignore`
 - `--docker`
 - `--editor`
 - `--rust`
