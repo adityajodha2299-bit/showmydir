@@ -1,6 +1,6 @@
 [project]
 name = "showmydir"
-version = "0.1.2"
+version = "0.2.0"
 description = "A powerful CLI tool to visualize and recreate directory structures with smart ignore rules"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -13,7 +13,8 @@ license = "MIT"
 
 dependencies = [
     "typer>=0.7.0",
-    "rich"
+    "rich",
+    "pathspec"
 ]
 
 [project.urls]

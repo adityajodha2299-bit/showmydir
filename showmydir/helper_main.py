@@ -3,7 +3,6 @@ from pathlib import Path
 
 from rich.console import Console
 
-# from pathspec import PathSpec
 from . import config
 from .config import CreateMode, Node
 from .customExceptions import (

@@ -7,8 +7,8 @@ import typer
 from rich.console import Console
 
 from .config import CreateMode, Mode, Node, ViewMode
-from .customExceptions import GitIgnoreFileNotFoundError
-from .helper_main import create_dir, read_gitignore, user_setted_ignores
+from .helper_main import create_dir, user_setted_ignores
+from .tree.ignore import IgnoreManager
 from .tree.renderer import FlatRenderer, JsonRenderer, TreeGenerator, TreeRenderer
 from .tree.smd import dict_to_node, search_smd
 
@@ -148,7 +148,7 @@ def view(
         match_nodes = search_smd(root_node, find)
         flat = FlatRenderer(
             root=file_,
-            ignore_list=set(),
+            pathspecs=IgnoreManager(),
             depth=None,
             show_size=show_size,
             show_size_disk=show_disk_size,
@@ -164,12 +164,12 @@ def view(
     elif mode == ViewMode.FLAT:
         flat = FlatRenderer(
             root=file_,
-            ignore_list=set(),
             depth=None,
             show_size=show_size,
             show_size_disk=show_disk_size,
             to_file=None,
             highlighted_files=set(),
+            pathspecs=IgnoreManager(),
         )
         flat.render(
             node=root_node,
@@ -188,7 +188,7 @@ def tree(
     ),
     uv: bool = typer.Option(
         False,
-        "--uv--ignore",
+        "--uv-ignore",
         help="Apply common Python/uv ignore patterns (.venv, pyproject.toml, etc.)",
     ),
     no_default_ignores: bool = typer.Option(
@@ -226,7 +226,7 @@ def tree(
         help="Mode: tree (default), flat, json",
     ),
     git_ignore: bool = typer.Option(
-        False,
+        True,
         "--gitignore/--no-gitignore",
         help="Reads gitignore files and excludes those files",
     ),
@@ -242,7 +242,18 @@ def tree(
         help="save the tree into file.",
     ),
 ):
-    final_ignore = user_setted_ignores(
+    final_ignore = set()
+    highlighted_set = set() if not highlights else set(highlights)
+
+    # Checks the correct root path
+    operation_dir = (root or Path.cwd()).resolve()
+    if not operation_dir.exists():
+        typer.echo(f"PathNotFoundError: {operation_dir} not exists")
+        raise typer.Exit(code=1)
+
+    # PathSpecs Ignores
+    pt_specs_ig = IgnoreManager()
+    pt_specs_ig.manage_pattern_list(
         no_default_ignores=no_default_ignores,
         uv=uv,
         python=python,
@@ -253,7 +264,10 @@ def tree(
         rust=rust,
         to_file=file_saver,
     )
-    highlighted_set = set() if not highlights else set(highlights)
+    pt_specs_ig.add_pattern(ignore)
+    if git_ignore:
+        pt_specs_ig.load_gitignore_file(operation_dir)
+    pt_specs_ig.compile()
 
     # if user stated some ignores files/dirs
     if ignore:
@@ -261,24 +275,11 @@ def tree(
             for part in item.split(","):
                 final_ignore.add(part.strip())
 
-    # Checks the correct root path
-    operation_dir = (root or Path.cwd()).resolve()
-    if not operation_dir.exists():
-        typer.echo(f"PathNotFoundError: {operation_dir} not exists")
-        raise typer.Exit(code=1)
-
-    if git_ignore:
-        try:
-            final_ignore.update(read_gitignore(operation_dir))
-        except GitIgnoreFileNotFoundError as exc:
-            typer.echo("No such gitignore file found")
-            raise typer.Exit(1) from exc
-
     # Mode of viewing
     if mode_of_viewing == Mode.TREE:
         TreeGenerator(
             root=operation_dir,
-            ignore_list=final_ignore,
+            ignore=pt_specs_ig,
             depth=depth,
             show_size=show_size,
             show_size_disk=show_disk_size,
@@ -288,12 +289,12 @@ def tree(
     elif mode_of_viewing == Mode.FLAT:
         FlatRenderer(
             root=operation_dir,
-            ignore_list=final_ignore,
             depth=depth,
             show_size=show_size,
             show_size_disk=show_disk_size,
             to_file=file_saver,
             highlighted_files=highlighted_set,
+            pathspecs=pt_specs_ig,
         ).call_render(operation_dir)
 
     elif mode_of_viewing == Mode.JSON:
@@ -304,7 +305,7 @@ def tree(
 
         JsonRenderer(
             root=operation_dir,
-            ignore_list=final_ignore,
+            ignore=pt_specs_ig,
             depth=depth,
             show_size=show_size,
             show_size_disk=show_disk_size,

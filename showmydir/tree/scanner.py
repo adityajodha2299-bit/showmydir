@@ -4,6 +4,7 @@ import fnmatch
 import os
 from pathlib import Path
 from secrets import choice as secret_choice
+from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.style import Style
@@ -13,20 +14,22 @@ from rich.text import Text
 from ..config import Bytes, MetaData, Node  # noqa: TID252
 from .utils import format_bytes
 
+if TYPE_CHECKING:
+    from .ignore import IgnoreManager
+
 
 class BaseGenerator:
     def __init__(
         self,
         root: Path,
-        ignore_list: set[str],
         depth: int | None,
         show_size: bool,
         show_size_disk: bool,
         to_file: str | None,
         highlighted_files: set[str],
+        pathspecs: IgnoreManager,
     ) -> None:
         self.root: Path = root.resolve()
-        self.ignore_list: set[str] = ignore_list
         self.max_depth: int | None = depth
         self.show_size: bool = show_size
         self.show_disk: bool = show_size_disk
@@ -37,11 +40,13 @@ class BaseGenerator:
         self.file_counts: int = 0
         self.total_size: float = 0
 
+        self.ignore = pathspecs
+
         self.console = (
             Console() if not self._file else Console(file=self._file_opener(Path(self._file)))
         )
 
-        self.permission_error_files_dirs: list[str] = []
+        self.permission_error_files_dirs: list[Path] = []
 
     def _file_opener(self, __file: Path, mode: str = "w"):
         self.f = open(__file, mode)  # type: ignore  # noqa: PTH123, SIM115
@@ -51,15 +56,24 @@ class BaseGenerator:
         if hasattr(self.console, "file") and self.console.file:
             self.console.file.close()
 
-    def _get_entries(self, path: Path) -> list[os.DirEntry[str]]:
+    def _get_entries(self, path: Path):
         try:
-            return sorted(
-                [e for e in os.scandir(path) if not self._is_ignored(e.name)],
+            entries = sorted(
+                os.scandir(path),
                 key=lambda e: (not e.is_dir(), e.name.lower()),
             )
-        except PermissionError as e:
-            self.permission_error_files_dirs.append(str(e))
-            return []
+            for entry in entries:
+                # makes a relative to root dir so pathspecs work properly
+                # as_posix make '\' into '/', to suppport windows too
+                entry_path = Path(entry.path)
+                rel_path = entry_path.relative_to(self.root).as_posix()
+                if not self.ignore.should_include(rel_path):
+                    continue
+                yield entry
+
+        except PermissionError:
+            self.permission_error_files_dirs.append(path)
+            return
 
     def _summary_stats(self):
         _size_data = format_bytes(bytes_size=self.total_size, dim=False)
@@ -83,15 +97,8 @@ class BaseGenerator:
             style = Style(color=chosen_color)
 
             for path in self.permission_error_files_dirs:
-                clear_path = Path(
-                    (path.split(":", 1)[-1]).strip().removeprefix("'").removesuffix("'")
-                )
-
-                text = Text(f"  • {clear_path}", style=style)
+                text = Text(f"  • {path}", style=style)
                 self.console.print(text)
-
-    def _is_ignored(self, name: str) -> bool:
-        return any(fnmatch.fnmatch(name, pattern) for pattern in self.ignore_list)
 
     def _is_highlighted(self, name: str) -> bool:
         return any(fnmatch.fnmatch(name, pattern) for pattern in self.highlighted_files)
@@ -110,19 +117,25 @@ class ScanEngine(BaseGenerator):
     def __init__(
         self,
         root: Path,
-        ignore_list: set[str],
         depth: int | None,
         show_size: bool,
         show_size_disk: bool,
         to_file: str | None,
         highlighted_files: set[str],
+        pathspecs: IgnoreManager,
     ) -> None:
         super().__init__(
-            root, ignore_list, depth, show_size, show_size_disk, to_file, highlighted_files
+            root,
+            depth,
+            show_size,
+            show_size_disk,
+            to_file,
+            highlighted_files,
+            pathspecs,
         )
 
     def scan(self, path: Path, current_depth: int = 0) -> Node | None:
-        if self.max_depth is not None and current_depth > self.max_depth:
+        if self.max_depth is not None and current_depth >= self.max_depth:
             return None
 
         try:

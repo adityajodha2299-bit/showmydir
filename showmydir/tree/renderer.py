@@ -15,13 +15,14 @@ from .utils import choose_file_colour, format_node_size
 
 if TYPE_CHECKING:
     from ..config import Node  # noqa: TID252
+    from .ignore import IgnoreManager
 
 
 class TreeGenerator(ScanEngine):
     def __init__(
         self,
         root: Path,
-        ignore_list: set[str],
+        ignore: IgnoreManager,
         depth: int | None,
         show_size: bool,
         show_size_disk: bool,
@@ -30,12 +31,12 @@ class TreeGenerator(ScanEngine):
     ):
         super().__init__(
             root=root,
-            ignore_list=ignore_list,
             depth=depth,
             show_size=show_size,
             show_size_disk=show_size_disk,
             to_file=to_file,
             highlighted_files=highlighted_files,
+            pathspecs=ignore,
         )
 
         self.root_node = self.scan(self.root)
@@ -89,16 +90,14 @@ class JsonRenderer(ScanEngine):
     def __init__(
         self,
         root: Path,
-        ignore_list: set[str],
+        ignore: IgnoreManager,
         depth: int | None,
         show_size: bool,
         show_size_disk: bool,
         to_file: str | None,
         highlighted_files: set[str],
     ) -> None:
-        super().__init__(
-            root, ignore_list, depth, show_size, show_size_disk, to_file, highlighted_files
-        )
+        super().__init__(root, depth, show_size, show_size_disk, to_file, highlighted_files, ignore)
         self.root_node = self.scan(self.root)
         if self.root_node is None:
             raise typer.Exit(code=1)

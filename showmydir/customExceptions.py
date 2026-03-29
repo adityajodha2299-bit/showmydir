@@ -15,3 +15,8 @@ class GitIgnoreFileNotFoundError(Exception):
 class InvalidNodeNameError(Exception):
     def __init__(self, name: str, message: str | None = None) -> None:
         super().__init__(message or f"Invalid node name: {name}")
+
+
+class IgnoreManagerCompileNotCalledError(Exception):
+    def __init__(self, message: str | None = None) -> None:
+        super().__init__(message or "IgnoreManager not compiled. Call compile() first.")
